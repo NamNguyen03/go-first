@@ -1,31 +1,32 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
-type album struct {
-	ID     string  `json:"id"`
-	Title  string  `json:"title"`
-	Artist string  `json:"artist"`
-	Price  float64 `json:"price"`
+type Person struct {
+	Name string `json:"name"`
+	Age  int    `json:"age"`
 }
 
-var albums = []album{
-	{ID: "1", Title: "Blue Train", Artist: "John Coltrane", Price: 56.99},
-	{ID: "2", Title: "Jeru", Artist: "Gerry Mulligan", Price: 17.99},
-	{ID: "3", Title: "Sarah Vaughan and Clifford Brown", Artist: "Sarah Vaughan", Price: 39.99},
+var persons = []Person{
+	{Name: "John", Age: 25},
+	{Name: "Alice", Age: 30},
+	{Name: "Bob", Age: 35},
+	{Name: "Eve", Age: 40},
 }
 
-func getAlbums(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, albums)
+func getAllPersons(w http.ResponseWriter, req *http.Request) {
+	json.NewEncoder(w).Encode(persons)
+}
+
+func greetings(w http.ResponseWriter, req *http.Request) {
+	w.Write([]byte("Hello go web! with Go"))
 }
 
 func main() {
-	router := gin.Default()
-	router.GET("/albums", getAlbums)
-
-	router.Run("localhost:8080")
+	http.HandleFunc("/", greetings)
+	http.HandleFunc("/persons", getAllPersons)
+	http.ListenAndServe(":8080", nil)
 }
